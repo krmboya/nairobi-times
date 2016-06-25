@@ -142,7 +142,7 @@ main {
 .hero {
   width: 100%;
   position: relative;
-  background-image: url("./images/dog.jpg");
+  background-image: url("./images/nbi.jpg");
   background-size: cover;
   height: 20em;
 }
