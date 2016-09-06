@@ -322,12 +322,6 @@ main {
   margin: 24px 0;
 }
 
-.snippet__thumbnail {
-  max-width: 100px;
-  float: left;
-  margin-right: 1em;
-}
-
 .snippet__title {
   font-weight: 500;
 }
