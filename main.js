@@ -72,6 +72,17 @@ $(function () {
 
     };
 
+    var snippetTemplate = $(".recent-news .snippet");
+
+    var createSnippet = function ( newsItem ) {
+	// Creates a template snippet for news item
+	var newSnippet = snippetTemplate.clone();
+	newSnippet.find("h3 a").text(newsItem["title"]);
+	newSnippet.find("h3 a").attr("href", newsItem["link"]);
+	newSnippet.find("p").text(newsItem["description"]);
+	return newSnippet
+    };
+
     // fetch each defined section
     for (var section in sectionUrls) {
 	if(sectionUrls.hasOwnProperty(section)) {
