@@ -65,6 +65,11 @@ $(function () {
 	req.then( 
 	    function( data ) {
 		feeds[category] = rssEntries(data);
+		// todo: use databinding instead
+		var domSection = $("#" + category + " ul");
+		topItems(category, 5).forEach(function(newsItem) {
+		    domSection.append(createSnippet(newsItem));
+		});
 	    },
 	    function () {
 		console.log("error encountered fetching feed");
@@ -82,6 +87,10 @@ $(function () {
 	newSnippet.find("p").text(newsItem["description"]);
 	return newSnippet
     };
+
+    var topItems = function ( category, count ) {
+	return feeds[category].slice(0, count);
+    }
 
     // fetch each defined section
     for (var section in sectionUrls) {
