@@ -1,6 +1,8 @@
 /* Code for the site */
 $(function () {
     "use strict";
+
+    var PROXY_URL = "http://proxy.99nth.com";
     
     var NATION_LATEST_URL = "http://www.nation.co.ke/latestrss.rss";
     var NATION_POLITICS_URL = "http://www.nation.co.ke/news/politics/" + 
@@ -12,9 +14,60 @@ $(function () {
     var NATION_TECH_URL = "http://www.nation.co.ke/business/Tech/" + 
 	"1017288-1017288-view-asFeed-14e217wz/index.xml";
 
-    var PROXY_URL = "http://proxy.99nth.com";
+    var snippetTemplate = $(".recent-news .snippet");
 
-    var feeds = {}
+    // Used to decode html encoded characters in feed
+    var dummyTextArea = document.createElement("textarea");
+
+    function decodeHtml(html) {
+	dummyTextArea.innerHTML = html;
+	return dummyTextArea.value;
+    }
+
+    var createSnippet = function ( newsItem ) {
+	// Creates a template snippet for news item
+	var newSnippet = snippetTemplate.clone();
+	newSnippet.find("h3 a").text(newsItem["title"]);
+	newSnippet.find("h3 a").attr("href", newsItem["link"]);
+	newSnippet.find("p").text(newsItem["description"]);
+	return newSnippet
+    };
+
+    var populateHero = function ( newsItem ){
+	// Sets the hero news item
+	var heroSection = $("section.hero");
+	heroSection.find("h2").text(newsItem["title"]);
+	heroSection.find("p").text(newsItem["description"]);
+    };
+
+    var topItems = function ( category, count ) {
+	// Returns first count entries from feed category
+	return feeds[category].slice(0, count);
+    }
+
+    // Construct the feeds object
+    // Exposes an .add method that triggers an 'added' event
+    var feeds = (function( obj ) {
+	obj.add = function(category, feed) {
+	    this[category] = feed;
+	    this.trigger('feed.added', [category]);
+	};
+	return obj;
+    })($({}))
+
+    // Populate appropriate news category on loading it
+    feeds.on("feed.added", function(e, category) {
+
+	var domSection = $("#" + category + " ul");
+	topItems(category, 5).forEach(function(newsItem) {
+	    domSection.append(createSnippet(newsItem));
+	});
+
+	// if latest section, populate hero
+	if (category === "politics") {
+	    populateHero(topItems(category, 1)[0]);
+	}
+    });
     
     var sectionUrls = {
 	"latest": NATION_LATEST_URL,
@@ -46,9 +99,9 @@ $(function () {
 	$(xml).find("item").each(function () {
 	    var element = $(this);
 	    var item = {
-		"title": element.find("title").text(),
+		"title": decodeHtml(element.find("title").text()),
 		"link": element.find("link").text(),
-		"description": element.find("description").text(),
+		"description": decodeHtml(element.find("description").text()),
 	    }
 
 	    items.push(item);
@@ -64,12 +117,7 @@ $(function () {
 
 	req.then( 
 	    function( data ) {
-		feeds[category] = rssEntries(data);
-		// todo: use databinding instead
-		var domSection = $("#" + category + " ul");
-		topItems(category, 5).forEach(function(newsItem) {
-		    domSection.append(createSnippet(newsItem));
-		});
+		feeds.add(category, rssEntries(data));
 	    },
 	    function () {
 		console.log("error encountered fetching feed");
@@ -77,25 +125,11 @@ $(function () {
 
     };
 
-    var snippetTemplate = $(".recent-news .snippet");
-
-    var createSnippet = function ( newsItem ) {
-	// Creates a template snippet for news item
-	var newSnippet = snippetTemplate.clone();
-	newSnippet.find("h3 a").text(newsItem["title"]);
-	newSnippet.find("h3 a").attr("href", newsItem["link"]);
-	newSnippet.find("p").text(newsItem["description"]);
-	return newSnippet
-    };
-
-    var topItems = function ( category, count ) {
-	return feeds[category].slice(0, count);
-    }
-
     // fetch each defined section
     for (var section in sectionUrls) {
 	if(sectionUrls.hasOwnProperty(section)) {
 	    setFeed(section, sectionUrls[section]);
 	}
     }
+
 });
