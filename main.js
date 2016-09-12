@@ -13,6 +13,7 @@ $(function () {
     var STANDARD_WORLDNEWS_URL = "http://www.standardmedia.co.ke/rss/world.php";
     var NATION_TECH_URL = "http://www.nation.co.ke/business/Tech/" + 
 	"1017288-1017288-view-asFeed-14e217wz/index.xml";
+    var TECHWEEZ_URL = "https://feeds.feedburner.com/techweez?format=xml"
 
     var snippetTemplate = $(".recent-news .snippet");
 
@@ -40,32 +41,44 @@ $(function () {
 	heroSection.find("p").text(newsItem["description"]);
     };
 
-    var topItems = function ( category, count ) {
-	// Returns first count entries from feed category
-	return feeds[category].slice(0, count);
+    var topDisplayedItems = function ( category ) {
+	// Returns the top items to be displayed
+
+	// get no items to display
+	var toBeDisplayed = feeds[category]["noDisplayed"]; 
+	return feeds[category]["feed"].slice(0, toBeDisplayed);
+    }
+
+    var topNewsItem = function ( category ) {
+	// Returns the top news item in category
+	return feeds[category]["feed"][0];
     }
 
     // Construct the feeds object
     // Exposes an .add method that triggers an 'added' event
     var feeds = (function( obj ) {
 	obj.add = function(category, feed) {
-	    this[category] = feed;
-	    this.trigger('feed.added', [category]);
+	    this[category] = {"feed":feed, "noDisplayed":5};
+	    this.trigger('display-category', [category]);
 	};
 	return obj;
     })($({}))
 
     // Populate appropriate news category on loading it
-    feeds.on("feed.added", function(e, category) {
+    feeds.on("display-category", function(e, category) {
 
 	var domSection = $("#" + category + " ul");
-	topItems(category, 5).forEach(function(newsItem) {
+	
+	// Empty the dom section
+	domSection.empty();
+	
+	topDisplayedItems(category).forEach(function(newsItem) {
 	    domSection.append(createSnippet(newsItem));
 	});
 
 	// if latest section, populate hero
 	if (category === "politics") {
-	    populateHero(topItems(category, 1)[0]);
+	    populateHero(topNewsItem(category));
 	}
     });
     
@@ -132,4 +145,26 @@ $(function () {
 	}
     }
 
+    // Display more/less news
+    $(".news__more").click(function(e){
+	// Changes the no of displayed items for the category
+	var element = $(this);
+	var category = element.closest("section.news").attr("id");
+
+	// Choose more/less
+	if (element.attr("data-view") === "less") {
+	    element.attr("data-view", "more");
+	    element.text("- less");
+	    feeds[category]["noDisplayed"] = 30;
+	} else {
+	    element.attr("data-view", "less");
+	    element.text("+ more");
+	    feeds[category]["noDisplayed"] = 5;
+	}
+
+	// Trigger redisplay of section
+	feeds.trigger("display-category", [category]);
+    });
+
 });
+

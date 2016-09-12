@@ -65,6 +65,13 @@ ul {
   margin-top: 12px;
 }
 
+/* Hide logo for small screens */
+@media screen and (max-width: 415px) {
+    .header__logo {
+	display: none;
+    }
+}
+
 .header__title {
   font-weight: 300;
   font-size: 4em;
@@ -158,6 +165,14 @@ main {
   color: #fff;
   padding: 1em;
 }
+
+/*hide hero for small screens*/
+@media screen and (max-width: 415px) {
+    .hero article {
+	display: none;
+    }
+}
+
 
 
 /*
