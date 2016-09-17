@@ -1,1 +1,1 @@
-What's happening in nairobi
+All your news, in just 3 minutes
