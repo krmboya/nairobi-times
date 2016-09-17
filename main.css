@@ -80,6 +80,10 @@ ul {
   color: #212121;
 }
 
+.header__subtext {
+    font-size: small;
+    margin: 0px 5px;
+}
 
 /*
  *
