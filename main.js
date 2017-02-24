@@ -13,7 +13,7 @@ $(function () {
     var STANDARD_WORLDNEWS_URL = "http://www.standardmedia.co.ke/rss/world.php";
     var NATION_TECH_URL = "http://www.nation.co.ke/business/Tech/" + 
 	"1017288-1017288-view-asFeed-14e217wz/index.xml";
-    var TECHWEEZ_URL = "https://feeds.feedburner.com/techweez?format=xml"
+    var TECHWEEZ_URL = "https://feeds.feedburner.com/techweez?format=xml";
 
     var snippetTemplate = $(".recent-news .snippet");
 
@@ -31,7 +31,7 @@ $(function () {
 	newSnippet.find("h3 a").text(newsItem["title"]);
 	newSnippet.find("h3 a").attr("href", newsItem["link"]);
 	newSnippet.find("p").text(newsItem["description"]);
-	return newSnippet
+	return newSnippet;
     };
 
     var populateHero = function ( newsItem ){
@@ -47,12 +47,12 @@ $(function () {
 	// get no items to display
 	var toBeDisplayed = feeds[category]["noDisplayed"]; 
 	return feeds[category]["feed"].slice(0, toBeDisplayed);
-    }
+    };
 
     var topNewsItem = function ( category ) {
 	// Returns the top news item in category
 	return feeds[category]["feed"][0];
-    }
+    };
 
     // Construct the feeds object
     // Exposes an .add method that triggers an 'added' event
@@ -62,7 +62,7 @@ $(function () {
 	    this.trigger('display-category', [category]);
 	};
 	return obj;
-    })($({}))
+    })($({}));
 
     // Populate appropriate news category on loading it
     feeds.on("display-category", function(e, category) {
@@ -89,7 +89,7 @@ $(function () {
 	"sports": STANDARD_SPORTS_URL,
 	"world": STANDARD_WORLDNEWS_URL,
 	"technology": NATION_TECH_URL
-    }
+    };
     
     var fetchURL = function ( url ) {
 	// Triggers a GET request on the url.
@@ -98,7 +98,7 @@ $(function () {
 	var jqXHR = $.ajax({
 	    url: PROXY_URL,
 	    headers: { "Upstream-URL": url },
-	    method: "GET",
+	    method: "GET"
 	});
 
 	return jqXHR;
@@ -114,8 +114,8 @@ $(function () {
 	    var item = {
 		"title": decodeHtml(element.find("title").text()),
 		"link": element.find("link").text(),
-		"description": decodeHtml(element.find("description").text()),
-	    }
+		"description": decodeHtml(element.find("description").text())
+	    };
 
 	    items.push(item);
 	});
